@@ -1,0 +1,48 @@
+<%- include('partials/header.ejs'); %>
+    
+    <div class="container">
+        <div class="card" id='form'>
+            <div class="card-body">
+                <h3>Login</h3>
+                <div id='formComponent'>
+                    <input type='email' class='form-control' name='email' placeholder="Digite seu email" />
+                    <input type="password" class='form-control' name='password' placeholder="Digite sua senha">
+                    <button onclick="login()" class='button btn-primary'>Entrar</button>
+                    <a href='/register'>Registrar-se</a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+<%- include('partials/footer.ejs'); %>
+<script src='/js/systemFunc.js'></script>
+<script>
+    function login(){
+        var email = document.getElementsByTagName('input')[0].value
+
+        //faz a verificação de email e manda a requisição para a rota de login 
+        if(emailVerify(email)){
+            var password = document.getElementsByTagName('input')[1].value
+            axios.post('http://localhost:3001/login', {email, password}).then(result=>{
+                
+                //verifica os status enviados
+                if(result.status == 204){
+                     alert("Email não encontrado")
+                }else if(result.status == 200){
+                    //cria um cookie com o token recebido e envia o usuário para a rota da dashboard
+                    localStorage.setItem('token', result.data)
+                     window.location = '/dashboard'
+                 }else if(result.status == 203){
+                     alert("Senha incorreta")
+                 }
+               
+            }).catch(error=>{
+                console.log(error)
+            })
+        }
+        
+    }
+</script>
+
+</html>

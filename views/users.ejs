@@ -1,0 +1,22 @@
+<%- include('partials/header.ejs'); %>
+
+<div class="container" id='userList'>
+    <div class='card'>
+        <div class='card-body'>
+            <% users.forEach(user=>{ %>
+                <div id='<%= user.id%>' class='info'>
+                    <span>Id: <%= user.id%></span>
+                    <span>Nome: <%= user.username%></span>
+                    <span>Idade: <%= user.age%></span>
+                    <span>E-mail: <%= user.email%></span>
+                    <a href='/delete/<%=user.id%>' class='btn btn-danger'>Deletar</a>
+                    <a href='/edit/<%=user.id%>' class='btn btn-warning'>Editar</a>
+                </div>
+            <%})%>
+        </div>
+        <a href="/dashboard">Voltar</a>
+    </div>
+</div>
+
+<%- include('partials/footer.ejs'); %>
+

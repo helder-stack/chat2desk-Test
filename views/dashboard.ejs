@@ -1,0 +1,110 @@
+<%- include('partials/header') %>
+
+    <div class="container"  id='dashboard'>
+        
+        <div id='user'>
+            <div id='username'><h3 id='userName'><span class='userInfo'></span></h3></div>
+            <div id='info'>
+                <div class='content'>Id: <span class='userInfo'></span></div>
+                <div class='content'>Nome: <span class='userInfo'></span></div>
+                <div class='content'>Email: <span class='userInfo'></div>
+                <div class='content'>Idade: <span class='userInfo'></span></div>
+            </div>
+        <a href='http://localhost:3001/logout'>Sair</a>
+        </div>
+
+
+        <div id='users'>
+            <div id='newUser'>
+                <div class="card" id='formRegister'>
+                    <div class="card-body">
+                        <h3>Registrar novo usuário</h3>
+                        <div id='formComponent'>
+                            <input type='text' name='nome' class='form-control' placeholder="Digite o nome completo"/>
+                            <input type="number" name='age' class='form-control' placeholder="Idade">
+                            <input type='email' class='form-control' name='email' placeholder="Digite seu email" />
+                            <input type="password" class='form-control' name='password' placeholder="Digite sua senha">
+                            <input type="password" class='form-control' name='password' placeholder="Confirme a senha">
+                            <button onclick="register()" class='button btn-primary'>Registrar novo usuário</button>
+                            <a href="/userList">Ver lista de usuários</a>
+                        </div>
+                        <a onclick='passwords()' style='cursor: pointer'>Clique aqui para ver as senhas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<%- include('partials/footer') %>
+<script src='/js/systemFunc.js'></script>
+<script>
+
+    //vai pegar as informações do usuário logado e colocá=las na página
+    function userInfo(){
+        axios.get('http://localhost:3001/getInfo').then(result=>{
+            var span = document.getElementsByClassName('userInfo')
+            span[0].innerHTML = result.data.username.split(" ")[0]
+            span[1].innerHTML = result.data.id
+            span[2].innerHTML = result.data.username
+            span[3].innerHTML = result.data.email
+            span[4].innerHTML = result.data.age 
+        }).catch(error=>{
+            console.log(error)
+        })
+
+        
+    }
+    userInfo()
+    
+    var pass = document.getElementsByName('password')
+    var viewPass = false
+
+    //função de registro de novo usuário
+    function register(){
+        let inputs = document.getElementsByTagName('input')
+        //verifica o nome colocado
+        if(!nameVerify(inputs[0].value)){
+            
+            inputs[0].style.border = '1px solid red'
+
+        }else{
+            //verifica a idade
+            if(!ageVerify(inputs[1].value)){
+                inputs[1].style.border = '1px solid red'
+            }else{
+                //verifica o email
+                if(!emailVerify(inputs[2].value)){
+                    inputs[2].style.border = '1px solid red'
+                }else{
+
+                        //verifica se a senha está nos padrões
+                        if(passFieldVerify()){
+                    
+                            axios.post('http://localhost:3001/register/user', {
+                                username: inputs[0].value,
+                                age: inputs[1].value,
+                                email: inputs[2].value,
+                                password: inputs[3].value
+                            }).then(result=>{
+                                if(result.status == 200){
+                                    alert("Registrado com sucesso!")
+                                    window.location = '/userList'
+                                }else if(result.status == 208){
+                                    alert("O email já existe")
+                                }else if(result.status == 203){
+                                    alert("Informações inválidas")
+                                }
+                            })
+
+                }else{
+                    inputs[3].style.border = '1px solid red'
+                }
+                    }
+                }
+        }
+        }
+        
+        
+</script>
+
+</html>

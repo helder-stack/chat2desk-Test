@@ -1,0 +1,126 @@
+<%- include('partials/header.ejs') %>
+
+<div class="container" id="edit">
+  <div class="card" id="formRegister">
+    <div class="card-body">
+      <h3>Editar dados de <%=userObject.username%></h3>
+      <div id="formComponent">
+        <input
+          type="text"
+          name="nome"
+          class="form-control"
+          placeholder="Digite o nome completo"
+          value="<%=userObject.username %>"
+        />
+        <input
+          type="number"
+          name="age"
+          class="form-control"
+          placeholder="Idade"
+          value="<%=userObject.age %>"
+        />
+        <input
+          type="email"
+          class="form-control"
+          name="email"
+          placeholder="Digite seu email"
+          value="<%=userObject.email %>"
+        />
+        <input
+          type="password"
+          class="form-control"
+          name="password"
+          placeholder="Nova senha"
+        />
+        <input
+          type="password"
+          class="form-control"
+          name="password"
+          placeholder="Confirme a senha"
+        />
+        <button onclick="edit()" class="button btn-primary">Salvar</button>
+        <input type="hidden" name="id" value="<%=userObject.id%>" />
+      </div>
+      <a onclick="passwords()" style="cursor: pointer"
+        >Clique aqui para ver as senhas</a
+      >
+      <p>Se não quiser alterar a senha, deixe o campo em branco</p>
+      <a href="/userList">Voltar</a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer.ejs') %>
+<script src="/js/systemFunc.js"></script>
+<script>
+  var pass = document.getElementsByName("password");
+  var viewPass = false;
+
+  function edit() {
+    let inputs = document.getElementsByTagName("input");
+
+    //faz a verificação dos campos
+    if (!nameVerify(inputs[0].value)) {
+      inputs[0].style.border = "1px solid red";
+    } else {
+      //verifica idade
+      if (!ageVerify(inputs[1].value)) {
+        inputs[1].style.border = "1px solid red";
+      } else {
+        //verifica email
+        if (!emailVerify(inputs[2].value)) {
+          inputs[2].style.border = "1px solid red";
+        } else {
+          //caso tudo ocorra bem, envia para a rota de edição de dados
+          //se a senha estiver vazia, indicando que o usuário não deseja trocar a senha
+          //enviará a senha vazia, para a verificação no backend
+          if (inputs[3].value == "") {
+            axios
+              .post("http://localhost:3001/edit", {
+                id: inputs[5].value,
+                username: inputs[0].value,
+                age: inputs[1].value,
+                email: inputs[2].value,
+                password: inputs[3].value,
+              })
+              .then((result) => {
+                if (result.status == 200) {
+                  alert("Os dados foram atualizados!");
+                  //caso tudo esteja ok, volta para a rota de listagem
+                  window.location = "/userList";
+                } else if (result.status == 208) {
+                  alert("O email já existe");
+                } else if (result.status == 203) {
+                  alert("Dados inválidos!");
+                }
+              });
+          } else {
+            //caso não esteja vazia, irá verificar se está dentro dos padrões
+            if (passFieldVerify()) {
+              axios
+                .post("http://localhost:3001/edit", {
+                  id: inputs[5].value,
+                  username: inputs[0].value,
+                  age: inputs[1].value,
+                  email: inputs[2].value,
+                  password: inputs[3].value,
+                })
+                .then((result) => {
+                  if (result.status == 200) {
+                    alert("Os dados foram atualizados!");
+                    window.location = "/userList";
+                  } else if (result.status == 208) {
+                    alert("O email já existe");
+                  } else if (result.status == 203) {
+                    alert("Formato de email não permitido");
+                  }
+                });
+            } else {
+              inputs[3].style.border = "1px solid red";
+            }
+          }
+        }
+      }
+    }
+  }
+</script>

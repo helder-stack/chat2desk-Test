@@ -1,0 +1,81 @@
+<%- include('partials/header.ejs'); %>
+
+<div class="container">
+    <div class="card" id='formRegister'>
+        <div class="card-body">
+            <h3>Nova conta</h3>
+            <div id='formComponent'>
+                <input type='text' name='nome' class='form-control' placeholder="Digite o nome completo"/>
+                <input type="number" name='age' class='form-control' placeholder="Idade">
+                <input type='email' class='form-control' name='email' placeholder="Digite seu email" />
+                <input type="password" class='form-control' name='password' placeholder="Digite sua senha">
+                <input type="password" class='form-control' name='password' placeholder="Confirme a senha">
+                <button onclick="register()" class='button btn-primary'>Registrar-se</button>
+            </div>
+            <a onclick='passwords()' style='cursor: pointer'>Clique aqui para ver as senhas</a>
+            <a href='/'>Voltar</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer.ejs'); %>
+<script src='/js/systemFunc.js'></script>
+<script>
+    var pass = document.getElementsByName('password')
+    var viewPass = false
+
+    function register(){
+        let inputs = document.getElementsByTagName('input')
+
+        //faz a validação dos campos
+
+        //começando pelo nome
+        if(!nameVerify(inputs[0].value)){
+            
+            inputs[0].style.border = '1px solid red'
+
+        }else{
+
+            //idade
+            if(!ageVerify(inputs[1].value)){
+                inputs[1].style.border = '1px solid red'
+            }else{
+                //email
+
+                if(!emailVerify(inputs[2].value)){
+                    inputs[2].style.border = '1px solid red'
+                }else{
+                    //senha
+                        if(passFieldVerify()){
+                            
+                            //faz o registro do usuário, caso ocorra tudo bem
+                            axios.post('http://localhost:3001/register/user', {
+                                username: inputs[0].value,
+                                age: inputs[1].value,
+                                email: inputs[2].value,
+                                password: inputs[3].value
+                            }).then(result=>{
+                                if(result.status == 200){
+                                    alert("Registrado com sucesso!")
+                                    window.location = '/'
+                                }else if(result.status == 208){
+                                    alert("O email já existe")
+                                }else if(result.status == 203){
+                                    alert("Informações inválidas")
+                                }
+                            })
+
+                }else{
+                    inputs[3].style.border = '1px solid red'
+                }
+                    }
+                }
+        }
+        
+        }
+        
+    
+
+</script>
+
+</html>
